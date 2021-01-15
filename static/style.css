@@ -58,7 +58,7 @@ input.input-username {
     padding-left: 60px;
     
       
-    background-image: url('img/bril_klein.png');
+    background-image: url('/static/bril_klein.png');
   
     background-position: 10px;
     background-repeat: no-repeat;

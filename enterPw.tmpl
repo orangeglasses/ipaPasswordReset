@@ -1,21 +1,20 @@
 <html>
 <head>
     <title>Enter password</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<form action="/confirmreset" method="post">
-    <input type="hidden" name="token" value={{.Token}} readonly>
-    <table>
-        <tr>
-            <td>Username:</td>
-            <td><input type="text" name="username" value={{.Username}} readonly></td>
-            </tr>
-        <tr>
-            <td>New Password</td>
-            <td><input type="password" name="password"></td>
-        </tr>
-    </table>
-    <input type="submit" value="Submit">
-</form>
+    <div class='box'>
+        <div>
+            <h1 class='h1-password'>PASSWORD RESET</h1>
+        </div>
+        <div class='form'>
+            <form action="/confirmreset" method="post">
+                <input type="hidden" name="token" value={{.Token}} readonly>
+                    <p><input class='input-username' type="text" name="username" value={{.Username}} readonly></p>
+                    <p><input class='input-username' type="password" name="password" placeholder="Password"></p>
+                <input class='input-submit' type="submit" value="Submit">
+            </form>
+        </div>
 </body>
 </html>

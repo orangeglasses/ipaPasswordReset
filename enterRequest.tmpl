@@ -1,16 +1,19 @@
 <html>
 <head>
     <title>Enter username</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<form action="/requestreset" method="post">
-    <table>
-        <tr>
-            <td>Username:</td>
-            <td><input type="text" name="username"></td>
-        </tr>
-    </table>
-    <input type="submit" value="Submit">
-</form>
+    <div class='box'>
+        <div>
+            <h1 class='h1-password'>PASSWORD RESET REQUEST</h1>
+        </div>
+        <div class='form'>
+            <form class='form-requestform' action="/requestreset" method="post">
+                <p><input class='input-username' type="text" name="username" placeholder="Username"><p>
+                <p><input class='input-submit' type="submit" value="SUBMIT"><p>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

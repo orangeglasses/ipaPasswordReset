@@ -1,12 +1,19 @@
 <html>
 <head>
     <title>Password reset</title>
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-{{if .Success}}
-    Password for {{.Username}} succesfully reset.
-{{else}}
-    An error occured while settings your password. Error: {{.ErrMessage}}
-{{end}}
+<div class='box'>
+    <img src='img/bril.png'>
+    {{if .Success}}
+        <h1 class='h1-password'>Success!</h1>
+        <p>Password for {{.Username}} succesfully reset.</p>
+    {{else}}
+        <h1 class='h1-password'>Error!</h1>
+        <p>An error occured while settings your password. Error: {{.ErrMessage}}</p>
+    {{end}}
+</div>
 </body>
 </html>

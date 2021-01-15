@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/kelseyhightower/envconfig"
@@ -26,7 +27,8 @@ type appConfig struct {
 
 	AppName string `default:"IPA Password Reset Selfservice"`
 	AppPort int    `default:"9000"`
-	Version string
+
+	TokenValidity time.Duration `default:"5m"`
 }
 
 func LoadConfig() appConfig {
@@ -47,7 +49,7 @@ func LoadConfig() appConfig {
 			log.Fatal(err)
 		}
 		config.RedisHost = redisServices[0].Credentials["host"].(string)
-		config.RedisPort = redisServices[0].Credentials["port"].(int)
+		config.RedisPort = int(redisServices[0].Credentials["port"].(float64))
 		config.RedisPassword = redisServices[0].Credentials["password"].(string)
 	}
 	return config

@@ -63,6 +63,7 @@ func main() {
 	r.Path("/confirmreset").Methods(http.MethodPost).HandlerFunc(pwResetHandler.HandleConfirmRequest)
 	r.Path("/enterpw/{username}/{token}").Methods(http.MethodGet).HandlerFunc(pwResetHandler.PresentPwResetForm)
 	r.Path("/").Methods(http.MethodGet).HandlerFunc(pwResetHandler.PresentResetRequestForm)
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.AppPort), r))
 }

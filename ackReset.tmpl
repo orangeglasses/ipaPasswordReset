@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>Password reset</title>
+</head>
+<body>
+{{if .Success}}
+    Password for {{.Username}} succesfully reset.
+{{else}}
+    An error occured while settings your password. Error: {{.ErrMessage}}
+{{end}}
+</body>
+</html>

@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>Request received</title>
+</head>
+<body>
+{{if .Success}}
+    Request to reset password for user {{.Username}} succesfully received. Please check you e-mail and click on the confirmation link
+{{else}}
+    An error occured while processing the password reset request. Error: {{.ErrMessage}}
+{{end}}
+</body>
+</html>

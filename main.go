@@ -35,7 +35,7 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 		},
 	}
 
-	ipaClient, err := freeipa.Connect("ipa.example.test", tr, "admin", "P@ssw0rd")
+	ipaClient, err := freeipa.Connect(config.IpaHost, tr, config.IpaUser, config.IpaPassword)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -42,11 +42,13 @@ func LoadConfig() appConfig {
 		appEnv, _ := cfenv.Current()
 		config.AppPort = appEnv.Port
 
-		/*redisServices, err := appEnv.Services.WithLabel("redis")
+		redisServices, err := appEnv.Services.WithTag("redis")
 		if err != nil {
 			log.Fatal(err)
 		}
-		redisServices[0].Credentials*/
+		config.RedisHost = redisServices[0].Credentials["host"].(string)
+		config.RedisPort = redisServices[0].Credentials["port"].(int)
+		config.RedisPassword = redisServices[0].Credentials["password"].(string)
 	}
 	return config
 }

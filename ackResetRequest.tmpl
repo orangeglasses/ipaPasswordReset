@@ -1,11 +1,11 @@
 <html>
 <head>
     <title>Request received</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <div class="box">
-    <img src='img/bril.png'>
+    <img src='/static/bril.png'>
     {{if .Success}}
         <h1 class='h1-password'>Success!</h1>
         <p>Request to reset password for user {{.Username}} succesfully received. Please check you e-mail and click on the confirmation link</p>

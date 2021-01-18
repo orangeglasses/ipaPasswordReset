@@ -8,7 +8,8 @@
     <img src='/static/bril.png'>
     {{if .Success}}
         <h1 class='h1-password'>Success!</h1>
-        <p>Request to reset password for user {{.Username}} succesfully received. Please check you e-mail and click on the confirmation link</p>
+        <p>Request to reset password for user {{.Username}} succesfully received. <u>Please check you e-mail and click the confirmation link within {{.Expire}} minutes.</u></p>
+        <p>Remark: In order to prevent unwanted harvesting of usernames, if you made a typo in your username we won't tell you so here. 
     {{else}}
         <h1 class='h1-password'>Error!</h1>
         <p>An error occured while processing the password reset request. Error: {{.ErrMessage}}</p>

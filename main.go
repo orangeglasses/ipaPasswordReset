@@ -22,10 +22,11 @@ import (
 )
 
 type pwResetReqHandler struct {
-	redisClient *redis.Client
-	mailClient  *gomail.Dialer
-	ipaClient   *freeipa.Client
-	config      appConfig
+	redisClient   *redis.Client
+	mailClient    *gomail.Dialer
+	ipaClient     *freeipa.Client
+	config        appConfig
+	BlockedGroups map[string]bool
 }
 
 func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
@@ -40,7 +41,7 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 		log.Fatal(err)
 	}
 
-	return &pwResetReqHandler{
+	newHandler := pwResetReqHandler{
 		redisClient: redis.NewClient(&redis.Options{
 			Addr:     fmt.Sprintf("%v:%v", config.RedisHost, config.RedisPort),
 			Password: config.RedisPassword,
@@ -50,10 +51,16 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 		ipaClient:  ipaClient,
 		config:     config,
 	}
+
+	newHandler.BlockedGroups = make(map[string]bool)
+	for _, v := range config.BlockedGroups {
+		newHandler.BlockedGroups[v] = true
+	}
+
+	return &newHandler
 }
 
 func main() {
-
 	config := LoadConfig()
 	pwResetHandler := NewPwResetReqHandler(config)
 

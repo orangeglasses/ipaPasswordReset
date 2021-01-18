@@ -9,13 +9,7 @@ import (
 
 	"github.com/tehwalris/go-freeipa/freeipa"
 	"golang.org/x/net/context"
-	"gopkg.in/gomail.v2"
 )
-
-type confirmResBody struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
 
 func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("ackReset.tmpl"))
@@ -38,17 +32,10 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 
 	ctx := context.Background()
 
-	//get token
+	//get token and Check token matches username
 	token, err := h.redisClient.Get(ctx, reqUsername).Result()
-	if err != nil {
-		templData.ErrMessage = "Invalid username or token"
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	//Check token matches username
-	if token != reqToken {
-		templData.ErrMessage = "Invalid username or token"
+	if err != nil || token != reqToken {
+		templData.ErrMessage = "Invalid or expired username or token"
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -62,6 +49,11 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 		return
 	}
 	userEmail := (*ipaUserResult.Result.Mail)[0]
+
+	//Check again if user is not in blocked group. This can only happen when Redis is compromised.
+	if h.userInBlockedGroup(*ipaUserResult.Result.MemberofGroup) {
+		return
+	}
 
 	//Reset PW
 	_, err = h.ipaClient.Passwd(&freeipa.PasswdArgs{Principal: reqUsername, Password: reqPassword}, &freeipa.PasswdOptionalArgs{})
@@ -84,16 +76,7 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 	log.Printf("Expiration date for user %s successfully set to %v\n", reqUsername, expDate)
 
 	//Send confirmation mail
-	m := gomail.NewMessage()
-	m.SetHeader("From", h.config.EmailFrom)
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Haas PW Reset Completed")
-	m.SetBody("text/plain", "Your password was reset")
-	if err = h.mailClient.DialAndSend(m); err != nil {
-		log.Println("Unable to send mail: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	h.sendMail(userEmail, "Password Reset Completed", "Your password was reset. If you did not request a password reset please contact your admin asap!")
 
 	//Delete token from Redis
 	if err := h.redisClient.Del(ctx, reqUsername).Err(); err != nil {

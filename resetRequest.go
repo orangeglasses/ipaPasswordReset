@@ -17,6 +17,31 @@ type ackResetRequestData struct {
 	Success    bool
 	Username   string
 	ErrMessage string
+	Expire     int
+}
+
+func (h pwResetReqHandler) userInBlockedGroup(memberOf []string) bool {
+	for _, grp := range memberOf {
+		if _, ok := h.BlockedGroups[grp]; ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (h pwResetReqHandler) sendMail(to, subject, msg string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", h.config.EmailFrom)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/plain", msg)
+	if err := h.mailClient.DialAndSend(m); err != nil {
+		log.Println("Unable to send mail: ", err)
+		return err
+	}
+
+	return nil
 }
 
 func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +54,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		Username:   username,
 		Success:    false,
 		ErrMessage: "General error",
+		Expire:     h.config.TokenValidity,
 	}
 
 	defer func() {
@@ -40,9 +66,18 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 
 	ipaResult, err := h.ipaClient.UserShow(&freeipa.UserShowArgs{}, &freeipa.UserShowOptionalArgs{UID: &username})
 	if err != nil {
-		log.Printf("Error looking up user %v. Error: %v", username, err)
-		w.WriteHeader(http.StatusNotFound)
-		templData.ErrMessage = "Error while looking up user in IPA"
+		log.Printf("Error looking up user %v. Error: %v\n", username, err)
+		templData.Success = true
+		return
+	}
+
+	blocked := h.userInBlockedGroup(*ipaResult.Result.MemberofGroup)
+	userEmail := (*ipaResult.Result.Mail)[0]
+
+	if blocked {
+		log.Printf("User %s is member of a blocked group\n", username)
+		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allow to reset you password. Please contact your admin.")
+		templData.Success = true
 		return
 	}
 
@@ -57,23 +92,17 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	err = h.redisClient.Set(ctx, username, token.String(), time.Duration(h.config.TokenValidity)*time.Minute).Err()
 	if err != nil {
 		log.Println("Unable to store token in redis: ", err)
-		templData.ErrMessage = fmt.Sprintf("Unable to store token: %v", err.Error())
+		templData.ErrMessage = fmt.Sprintf("Unable to store token. Please contact you system admin if this problem persists.")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	log.Println("Token stored for user: ", username)
+	confirmLink := fmt.Sprintf("http://%v/enterpw/%v/%v", r.Host, username, token.String())
+	if err = h.sendMail(userEmail, "Password Reset confirmation link", confirmLink); err != nil {
+		h.redisClient.Del(ctx, username)
 
-	userEmail := (*ipaResult.Result.Mail)[0]
-
-	m := gomail.NewMessage()
-	m.SetHeader("From", h.config.EmailFrom)
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Haas PW Reset ")
-	m.SetBody("text/plain", fmt.Sprintf("http://%v/enterpw/%v/%v", r.Host, username, token.String()))
-	if err = h.mailClient.DialAndSend(m); err != nil {
-		log.Println("Unable to send mail: ", err)
-		log.Println("token: ", token.String())
+		templData.ErrMessage = "Sorry, I was unable to send reset confirmation link by e-mail. Please try again later."
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

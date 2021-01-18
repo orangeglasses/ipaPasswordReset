@@ -27,6 +27,7 @@ type appConfig struct {
 	AppPort int    `default:"9000"`
 
 	TokenValidity int `default:"5"`
+	BlockedGroups []string
 }
 
 func LoadConfig() appConfig {

@@ -7,9 +7,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type guiHandlerType struct {
-}
-
 type enterPwData struct {
 	Username string
 	Token    string

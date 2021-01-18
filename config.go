@@ -43,11 +43,16 @@ func LoadConfig() appConfig {
 
 		redisServices, err := appEnv.Services.WithTag("redis")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("No Redis service bound to this app", err)
 		}
 		config.RedisHost = redisServices[0].Credentials["host"].(string)
 		config.RedisPort = int(redisServices[0].Credentials["port"].(float64))
 		config.RedisPassword = redisServices[0].Credentials["password"].(string)
+	} else {
+
+		if config.RedisHost == "" {
+			log.Fatal("No Redis host configured. Please set PWRESET_REDISHOST")
+		}
 	}
 	return config
 }

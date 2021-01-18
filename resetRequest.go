@@ -46,8 +46,6 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	//	fmt.Println(ipaResult.Value)
-
 	token, err := uuid.NewUUID()
 	if err != nil {
 		log.Println("Unable to generate UUID: ", err)
@@ -56,7 +54,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = h.redisClient.Set(ctx, username, token.String(), 5*time.Minute).Err()
+	err = h.redisClient.Set(ctx, username, token.String(), time.Duration(h.config.TokenValidity)*time.Minute).Err()
 	if err != nil {
 		log.Println("Unable to store token in redis: ", err)
 		templData.ErrMessage = fmt.Sprintf("Unable to store token: %v", err.Error())

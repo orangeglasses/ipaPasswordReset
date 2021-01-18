@@ -57,7 +57,7 @@ func main() {
 	config := LoadConfig()
 	pwResetHandler := NewPwResetReqHandler(config)
 
-	log.Println("Starting http server")
+	log.Println("Starting http server on port: ", config.AppPort)
 	r := mux.NewRouter()
 	r.Path("/requestreset").Methods(http.MethodPost).HandlerFunc(pwResetHandler.HandleResetRequest)
 	r.Path("/confirmreset").Methods(http.MethodPost).HandlerFunc(pwResetHandler.HandleConfirmRequest)

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"time"
 
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/kelseyhightower/envconfig"
@@ -28,7 +26,7 @@ type appConfig struct {
 	AppName string `default:"IPA Password Reset Selfservice"`
 	AppPort int    `default:"9000"`
 
-	TokenValidity time.Duration `default:"5m"`
+	TokenValidity int `default:"5"`
 }
 
 func LoadConfig() appConfig {
@@ -38,7 +36,6 @@ func LoadConfig() appConfig {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Starting app on port: ", config.AppPort)
 
 	if cfenv.IsRunningOnCF() {
 		appEnv, _ := cfenv.Current()

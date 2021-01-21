@@ -83079,11 +83079,11 @@ func (out *Group) UnmarshalJSON(data []byte) error {
 			out.MemberofindirectGroup = &plainV
 		} else if sliceOk {
 
-			if len(sliceV) == 1 {
-				out.MemberofindirectGroup = &sliceV[0]
-			} else if len(sliceV) > 1 {
-				return fmt.Errorf("unexpected value for field MemberofindirectGroup: %v; expected at most one element", raw)
-			}
+			//			if len(sliceV) == 1 {
+			out.MemberofindirectGroup = &sliceV[0]
+			//			} else if len(sliceV) > 1 {
+			//				return fmt.Errorf("unexpected value for field MemberofindirectGroup: %v; expected at most one element", raw)
+			//			}
 
 		} else {
 			return fmt.Errorf("unexpected value for field MemberofindirectGroup: %v (%v)", raw, reflect.TypeOf(raw))

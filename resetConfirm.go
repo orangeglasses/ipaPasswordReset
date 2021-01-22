@@ -19,10 +19,16 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 	reqToken := r.FormValue("token")
 	reqPassword := r.FormValue("password")
 
-	templData := ackResetRequestData{
+	templData := struct {
+		Success    bool
+		Username   string
+		ErrMessage string
+		AppName    string
+	}{
 		Success:    false,
 		Username:   reqUsername,
 		ErrMessage: "General error",
+		AppName:    h.config.AppName,
 	}
 
 	defer func() {
@@ -37,6 +43,11 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 	if err != nil || token != reqToken {
 		templData.ErrMessage = "Invalid or expired username or token"
 		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if len(reqPassword) < h.config.MinPasswordLength {
+		templData.ErrMessage = "Password does not meet minimum length requirement"
 		return
 	}
 

@@ -7,17 +7,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type enterPwData struct {
-	Username string
-	Token    string
-}
-
 func (h pwResetReqHandler) PresentPwResetForm(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	data := enterPwData{
-		Username: mux.Vars(r)["username"],
-		Token:    mux.Vars(r)["token"],
+	data := struct {
+		Username    string
+		Token       string
+		AppName     string
+		MinPwLength int
+	}{
+		Username:    mux.Vars(r)["username"],
+		Token:       mux.Vars(r)["token"],
+		AppName:     h.config.AppName,
+		MinPwLength: h.config.MinPasswordLength,
 	}
 
 	tmpl := template.Must(template.ParseFiles("enterPw.tmpl"))
@@ -30,5 +32,9 @@ func (h pwResetReqHandler) PresentResetRequestForm(w http.ResponseWriter, r *htt
 
 	tmpl := template.Must(template.ParseFiles("enterRequest.tmpl"))
 
-	tmpl.Execute(w, nil)
+	data := struct {
+		AppName string
+	}{AppName: h.config.AppName}
+
+	tmpl.Execute(w, data)
 }

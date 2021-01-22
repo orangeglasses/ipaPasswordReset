@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Enter password</title>
+    <title>{{.AppName}}</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
             <form action="/confirmreset" method="post">
                 <input type="hidden" name="token" value={{.Token}} readonly>
                     <p><input class='input-username' type="text" name="username" value={{.Username}} readonly></p>
-                    <p><input class='input-username' type="password" name="password" placeholder="Password"></p>
+                    <p><input class='input-username' type="password" name="password" minlength={{.MinPwLength}} placeholder="Password"></p>
                 <input class='input-submit' type="submit" value="Submit">
             </form>
         </div>

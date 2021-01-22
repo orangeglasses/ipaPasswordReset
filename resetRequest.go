@@ -13,13 +13,6 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-type ackResetRequestData struct {
-	Success    bool
-	Username   string
-	ErrMessage string
-	Expire     int
-}
-
 func (h pwResetReqHandler) userInBlockedGroup(memberOf *[]string) bool {
 	if memberOf == nil {
 		return false
@@ -55,7 +48,13 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	r.ParseForm()
 
 	username := r.FormValue("username")
-	templData := ackResetRequestData{
+	templData := struct {
+		Success    bool
+		Username   string
+		ErrMessage string
+		Expire     int
+		AppName    string
+	}{
 		Username:   username,
 		Success:    false,
 		ErrMessage: "General error",

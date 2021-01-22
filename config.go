@@ -26,8 +26,9 @@ type appConfig struct {
 	AppName string `default:"IPA Password Reset Selfservice"`
 	AppPort int    `default:"9000"`
 
-	TokenValidity int `default:"5"`
-	BlockedGroups []string
+	TokenValidity     int `default:"5"`
+	BlockedGroups     []string
+	MinPasswordLength int `default:"12"`
 }
 
 func LoadConfig() appConfig {

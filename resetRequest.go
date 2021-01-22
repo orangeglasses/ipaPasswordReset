@@ -103,7 +103,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	}
 
 	log.Println("Token stored for user: ", username)
-	confirmLink := fmt.Sprintf("http://%v/enterpw/%v/%v", r.Host, username, token.String())
+	confirmLink := fmt.Sprintf("https://%v/enterpw/%v/%v", r.Host, username, token.String())
 	if err = h.sendMail(userEmail, "Password Reset confirmation link", confirmLink); err != nil {
 		h.redisClient.Del(ctx, username)
 

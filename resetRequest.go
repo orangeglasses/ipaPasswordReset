@@ -20,8 +20,13 @@ type ackResetRequestData struct {
 	Expire     int
 }
 
-func (h pwResetReqHandler) userInBlockedGroup(memberOf []string) bool {
-	for _, grp := range memberOf {
+func (h pwResetReqHandler) userInBlockedGroup(memberOf *[]string) bool {
+	if memberOf == nil {
+		return false
+	}
+
+	m := *memberOf
+	for _, grp := range m {
 		if _, ok := h.BlockedGroups[grp]; ok {
 			return true
 		}
@@ -71,7 +76,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	blocked := h.userInBlockedGroup(*ipaResult.Result.MemberofGroup)
+	blocked := h.userInBlockedGroup(ipaResult.Result.MemberofGroup)
 	userEmail := (*ipaResult.Result.Mail)[0]
 
 	if blocked {

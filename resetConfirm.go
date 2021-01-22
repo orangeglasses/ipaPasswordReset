@@ -51,7 +51,7 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 	userEmail := (*ipaUserResult.Result.Mail)[0]
 
 	//Check again if user is not in blocked group. This can only happen when Redis is compromised.
-	if h.userInBlockedGroup(*ipaUserResult.Result.MemberofGroup) {
+	if h.userInBlockedGroup(ipaUserResult.Result.MemberofGroup) {
 		return
 	}
 

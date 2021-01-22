@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/tehwalris/go-freeipa/freeipa"
+	"github.com/vchrisr/go-freeipa/freeipa"
 	"gopkg.in/gomail.v2"
 )
 

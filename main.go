@@ -17,7 +17,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
-	"github.com/tehwalris/go-freeipa/freeipa"
+	"github.com/vchrisr/go-freeipa/freeipa"
 	"gopkg.in/gomail.v2"
 )
 
@@ -41,13 +41,15 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 		log.Fatal(err)
 	}
 
+	mailTLSConfig := &tls.Config{InsecureSkipVerify: true}
+
 	newHandler := pwResetReqHandler{
 		redisClient: redis.NewClient(&redis.Options{
 			Addr:     fmt.Sprintf("%v:%v", config.RedisHost, config.RedisPort),
 			Password: config.RedisPassword,
 			DB:       config.RedisDB,
 		}),
-		mailClient: &gomail.Dialer{Host: config.EmailHost, Port: config.EmailPort},
+		mailClient: &gomail.Dialer{Host: config.EmailHost, Port: config.EmailPort, TLSConfig: mailTLSConfig},
 		ipaClient:  ipaClient,
 		config:     config,
 	}

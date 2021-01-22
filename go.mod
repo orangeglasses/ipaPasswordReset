@@ -15,7 +15,7 @@ require (
 	github.com/nxadm/tail v1.4.6 // indirect
 	github.com/sclevine/spec v1.4.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
-	github.com/tehwalris/go-freeipa v0.0.0-20200322083409-e462fc554b76
+	github.com/vchrisr/go-freeipa/freeipa v0.0.0-20210122101421-27481189d5d9
 	go.opentelemetry.io/otel v0.16.0 // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect

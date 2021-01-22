@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tehwalris/go-freeipa/freeipa"
+	"github.com/vchrisr/go-freeipa/freeipa"
 	"golang.org/x/net/context"
 )
 

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/vchrisr/go-freeipa/freeipa"
@@ -27,6 +28,16 @@ func (h pwResetReqHandler) userInBlockedGroup(memberOf *[]string) bool {
 
 	return false
 }
+
+func (h pwResetReqHandler) userInBlockedPrefixes(username string) bool {
+	for _, prefix := range h.config.BlockedPrefixes {
+		if strings.HasPrefix(username, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
 
 func (h pwResetReqHandler) sendMail(to, subject, msg string) error {
 	m := gomail.NewMessage()
@@ -76,11 +87,12 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	}
 
 	blocked := h.userInBlockedGroup(ipaResult.Result.MemberofGroup)
+	blockedByPrefix := h.userInBlockedPrefixes(username)
 	userEmail := (*ipaResult.Result.Mail)[0]
 
-	if blocked {
+	if blocked || blockedByPrefix {
 		log.Printf("User %s is member of a blocked group\n", username)
-		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allow to reset you password. Please contact your admin.")
+		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allowed to reset your password as the given account is either member of a blocked group or has a specific prefix. Please contact your admin.")
 		templData.Success = true
 		return
 	}

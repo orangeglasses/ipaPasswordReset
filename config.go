@@ -28,6 +28,7 @@ type appConfig struct {
 
 	TokenValidity     int `default:"5"`
 	BlockedGroups     []string
+	BlockedPrefixes   []string
 	MinPasswordLength int `default:"12"`
 }
 

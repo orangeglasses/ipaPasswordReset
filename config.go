@@ -8,9 +8,10 @@ import (
 )
 
 type appConfig struct {
-	IpaHost     string `required:"true"`
-	IpaUser     string `required:"true"`
-	IpaPassword string `required:"true"`
+	IpaHost                 string `required:"true"`
+	IpaUser                 string `required:"true"`
+	IpaPassword             string `required:"true"`
+	IpaEnableAccountOnReset bool   `default:"false"`
 
 	EmailHost     string `required:"true"`
 	EmailPort     int    `required:"true"`

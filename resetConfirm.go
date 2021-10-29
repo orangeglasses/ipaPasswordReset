@@ -77,7 +77,7 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 
 	//Set expiration date
 	expDate := time.Now().In(time.UTC).Truncate(time.Second).AddDate(0, 3, 0)
-	lock := false
+	lock := h.config.IpaEnableAccountOnReset
 
 	_, err = h.ipaClient.UserMod(&freeipa.UserModArgs{}, &freeipa.UserModOptionalArgs{UID: &reqUsername, Krbpasswordexpiration: &expDate, Nsaccountlock: &lock})
 	if err != nil && !strings.HasPrefix(err.Error(), "unexpected value for field Krbpasswordexpiration") {

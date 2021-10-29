@@ -6,8 +6,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/vchrisr/go-freeipa/freeipa"
@@ -37,7 +37,6 @@ func (h pwResetReqHandler) userInBlockedPrefixes(username string) bool {
 	}
 	return false
 }
-
 
 func (h pwResetReqHandler) sendMail(to, subject, msg string) error {
 	m := gomail.NewMessage()
@@ -89,10 +88,11 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	blocked := h.userInBlockedGroup(ipaResult.Result.MemberofGroup)
 	blockedByPrefix := h.userInBlockedPrefixes(username)
 	userEmail := (*ipaResult.Result.Mail)[0]
+	DontEnableButLocked := !h.config.IpaEnableAccountOnReset && *ipaResult.Result.Nsaccountlock //account enabling not allowed but current account is locked
 
-	if blocked || blockedByPrefix {
-		log.Printf("User %s is member of a blocked group\n", username)
-		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allowed to reset your password as the given account is either member of a blocked group or has a specific prefix. Please contact your admin.")
+	if blocked || blockedByPrefix || DontEnableButLocked {
+		log.Printf("User %s is locked, member of a blocked group, or blocked prefix\n", username)
+		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allowed to reset your password as the given account matches one of these conditions: Account is locked, Account is member of a blocked group Or account name has a specific prefix. Please contact your admin.")
 		templData.Success = true
 		return
 	}

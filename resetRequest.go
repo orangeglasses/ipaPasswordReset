@@ -88,7 +88,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 	blocked := h.userInBlockedGroup(ipaResult.Result.MemberofGroup)
 	blockedByPrefix := h.userInBlockedPrefixes(username)
 	userEmail := (*ipaResult.Result.Mail)[0]
-	DontEnableButLocked := !h.config.IpaEnableAccountOnReset && *ipaResult.Result.Nsaccountlock //account enabling not allowed but current account is locked
+	DontEnableButLocked := (!h.config.IpaEnableAccountOnReset && *ipaResult.Result.Nsaccountlock) //account enabling not allowed but current account is locked
 
 	if blocked || blockedByPrefix || DontEnableButLocked {
 		log.Printf("User %s is locked, member of a blocked group, or blocked prefix\n", username)

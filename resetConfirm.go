@@ -66,6 +66,19 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	if *ipaUserResult.Result.Nsaccountlock {
+		if !h.config.IpaEnableAccountOnReset {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		_, err = h.ipaClient.UserEnable(&freeipa.UserEnableArgs{}, &freeipa.UserEnableOptionalArgs{UID: &reqUsername})
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
 	//Reset PW
 	_, err = h.ipaClient.Passwd(&freeipa.PasswdArgs{Principal: reqUsername, Password: reqPassword}, &freeipa.PasswdOptionalArgs{})
 	if err != nil {
@@ -77,9 +90,8 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 
 	//Set expiration date
 	expDate := time.Now().In(time.UTC).Truncate(time.Second).AddDate(0, 3, 0)
-	lock := h.config.IpaEnableAccountOnReset
 
-	_, err = h.ipaClient.UserMod(&freeipa.UserModArgs{}, &freeipa.UserModOptionalArgs{UID: &reqUsername, Krbpasswordexpiration: &expDate, Nsaccountlock: &lock})
+	_, err = h.ipaClient.UserMod(&freeipa.UserModArgs{}, &freeipa.UserModOptionalArgs{UID: &reqUsername, Krbpasswordexpiration: &expDate})
 	if err != nil && !strings.HasPrefix(err.Error(), "unexpected value for field Krbpasswordexpiration") {
 		w.WriteHeader(http.StatusNotFound)
 		return

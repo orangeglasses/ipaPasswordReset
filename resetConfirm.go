@@ -74,6 +74,7 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 
 		_, err = h.ipaClient.UserEnable(&freeipa.UserEnableArgs{}, &freeipa.UserEnableOptionalArgs{UID: &reqUsername})
 		if err != nil {
+			log.Printf("enable failed: ", err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}

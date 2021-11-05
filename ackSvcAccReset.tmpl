@@ -3,30 +3,50 @@
     <title>{{.AppName}}</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
-		.spoiler:not(:hover), .spoiler:not(:hover) * {
+		.pw:not(:hover), .pw:not(:hover) * {
 			color:transparent !important;
 		}
-		.spoiler:not(:hover) {
+		.pw:not(:hover) {
 			text-shadow:0 0 12px #4D5763;
 		}
-		.spoiler {
+		.pw {
 			transition:color 0.25s ease, text-shadow 0.25s ease;
 		}
-		.spoiler * {
+		.pw * {
 			transition:color 0.25s ease;
 		}
-	</style>
+	</style>    
 </head>
 <body>
 <div class='box'>
     <img src='/static/logo.png'>
     {{if .Success}}
         <h1 class='h1-password'>Success!</h1>
-        <p>New password for {{.Username}}: <span class="spoiler">{{.Password}}</span></p>
+        <p>New password for {{.Username}}: <span class="pw">{{.Password}}</span></p>
+        <p><button class="js-copypwbtn">Copy Password To Clipboard</button></p>
     {{else}}
         <h1 class='h1-password'>Error!</h1>
         <p>An error occured while settings your password. Error: {{.ErrMessage}}</p>
     {{end}}
 </div>
 </body>
+<script>
+    var copyPwBtn = document.querySelector('.js-copypwbtn');  
+    copyPwBtn.addEventListener('click', function(event) {  
+        var password = document.querySelector('.pw');  
+        var range = document.createRange();  
+        range.selectNode(password);  
+        window.getSelection().addRange(range);  
+
+        try {                
+            var successful = document.execCommand('copy');  
+            var msg = successful ? 'successful' : 'unsuccessful';  
+            console.log('Copy command was ' + msg);  
+        } catch(err) {  
+            console.log('unable to copy');  
+        }  
+
+        window.getSelection().removeAllRanges();  
+    });
+    </script>
 </html>

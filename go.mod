@@ -14,6 +14,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/nxadm/tail v1.4.6 // indirect
 	github.com/sclevine/spec v1.4.0 // indirect
+	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/vchrisr/go-freeipa/freeipa v0.0.0-20210122101421-27481189d5d9
 	go.opentelemetry.io/otel v0.16.0 // indirect

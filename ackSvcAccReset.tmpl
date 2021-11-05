@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>{{.AppName}}</title>
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+<body>
+<div class='box'>
+    <img src='/static/logo.png'>
+    {{if .Success}}
+        <h1 class='h1-password'>Success!</h1>
+        <p>New password for {{.Username}}: {{.Password}}</p>
+    {{else}}
+        <h1 class='h1-password'>Error!</h1>
+        <p>An error occured while settings your password. Error: {{.ErrMessage}}</p>
+    {{end}}
+</div>
+</body>
+</html>

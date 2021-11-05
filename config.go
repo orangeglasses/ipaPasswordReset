@@ -27,10 +27,14 @@ type appConfig struct {
 	AppName string `default:"IPA Password Reset Selfservice"`
 	AppPort int    `default:"9000"`
 
-	TokenValidity     int `default:"5"`
-	BlockedGroups     []string
-	BlockedPrefixes   []string
-	MinPasswordLength int `default:"12"`
+	TokenValidity          int `default:"5"`
+	BlockedGroups          []string
+	BlockedPrefixes        []string
+	ServiceAccountPrefixes []string
+	MinPasswordLength      int `default:"12"`
+	SvcAccPasswordLength   int `default:"40"`
+	UserPwValidityMonths   int `default:"3"`
+	SvcAccPwValidityMonths int `default:"12"`
 }
 
 func LoadConfig() appConfig {
@@ -58,5 +62,6 @@ func LoadConfig() appConfig {
 			log.Fatal("No Redis host configured. Please set PWRESET_REDISHOST")
 		}
 	}
+
 	return config
 }

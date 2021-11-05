@@ -38,12 +38,36 @@ func (h pwResetReqHandler) userInBlockedPrefixes(username string) bool {
 	return false
 }
 
-func (h pwResetReqHandler) sendMail(to, subject, msg string) error {
+func (h pwResetReqHandler) userInSvcAccountPrefixes(username string) bool {
+	for _, prefix := range h.config.ServiceAccountPrefixes {
+		if strings.HasPrefix(username, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func (h pwResetReqHandler) getUserMail(user freeipa.User) (string, string) {
+	userEmail := (*user.Mail)[0]
+	mailCC := ""
+	if len((*user.Mail)) > 1 {
+		mailAddresses := (*user.Mail)[1:]
+		mailCC = strings.Join(mailAddresses, ",")
+	}
+
+	return userEmail, mailCC
+}
+
+func (h pwResetReqHandler) sendMail(to, cc, subject, msg string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", h.config.EmailFrom)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", msg)
+	if cc != "" {
+		m.SetHeader("Cc", cc)
+	}
+
 	if err := h.mailClient.DialAndSend(m); err != nil {
 		log.Println("Unable to send mail: ", err)
 		return err
@@ -87,12 +111,12 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 
 	blocked := h.userInBlockedGroup(ipaResult.Result.MemberofGroup)
 	blockedByPrefix := h.userInBlockedPrefixes(username)
-	userEmail := (*ipaResult.Result.Mail)[0]
+	userEmail, mailCC := h.getUserMail(ipaResult.Result)
 	DontEnableButLocked := (!h.config.IpaEnableAccountOnReset && *ipaResult.Result.Nsaccountlock) //account enabling not allowed but current account is locked
 
 	if blocked || blockedByPrefix || DontEnableButLocked {
 		log.Printf("User %s is locked, member of a blocked group, or blocked prefix\n", username)
-		h.sendMail(userEmail, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allowed to reset your password as the given account matches one of these conditions: Account is locked, Account is member of a blocked group Or account name has a specific prefix. Please contact your admin.")
+		h.sendMail(userEmail, mailCC, "Password reset request denied", "Thank you for using this service to request a password reset. Unfortunately I am not allowed to reset your password as the given account matches one of these conditions: Account is locked, Account is member of a blocked group Or account name has a specific prefix. Please contact your admin.")
 		templData.Success = true
 		return
 	}
@@ -112,10 +136,11 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	log.Println("Token stored for user: ", username)
+
 	confirmLink := fmt.Sprintf("https://%v/enterpw/%v/%v", r.Host, username, token.String())
-	if err = h.sendMail(userEmail, "Password Reset confirmation link", confirmLink); err != nil {
+
+	if err = h.sendMail(userEmail, mailCC, fmt.Sprintf("Password reset link for %s", username), fmt.Sprintf("Open this link within %v minutes to reset the password for account %s: %s", h.config.TokenValidity, username, confirmLink)); err != nil {
 		h.redisClient.Del(ctx, username)
 
 		templData.ErrMessage = "Sorry, I was unable to send reset confirmation link by e-mail. Please try again later."

@@ -22,7 +22,12 @@ func (h pwResetReqHandler) PresentPwResetForm(w http.ResponseWriter, r *http.Req
 		MinPwLength: h.config.MinPasswordLength,
 	}
 
-	tmpl := template.Must(template.ParseFiles("enterPw.tmpl"))
+	tmplFile := "enterPw.tmpl"
+	if h.userInSvcAccountPrefixes(data.Username) {
+		tmplFile = "enterSvcAccConfirm.tmpl"
+	}
+
+	tmpl := template.Must(template.ParseFiles(tmplFile))
 
 	tmpl.Execute(w, data)
 }

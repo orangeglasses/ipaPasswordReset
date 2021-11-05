@@ -58,7 +58,6 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 	for _, v := range config.BlockedGroups {
 		newHandler.BlockedGroups[v] = true
 	}
-	
 
 	return &newHandler
 }

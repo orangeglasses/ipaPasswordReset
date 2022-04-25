@@ -1,0 +1,14 @@
+---
+applications:
+- name: ((appname))   
+  stack: cflinuxfs3
+  routes:
+  - route: ((route))
+  instances: ((instances))
+  memory: 32M
+  disk_quota: 32M 
+  health-check-type: port
+  buildpacks:
+  - go_buildpack
+  services:
+  - ((redis-instance-name))

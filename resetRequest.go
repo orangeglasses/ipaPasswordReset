@@ -47,25 +47,26 @@ func (h pwResetReqHandler) userInSvcAccountPrefixes(username string) bool {
 	return false
 }
 
-func (h pwResetReqHandler) getUserMail(user freeipa.User) (string, string) {
+func (h pwResetReqHandler) getUserMail(user freeipa.User) (string, []string) {
+	var mailCC []string
+
 	userEmail := (*user.Mail)[0]
-	mailCC := ""
+
 	if len((*user.Mail)) > 1 {
-		mailAddresses := (*user.Mail)[1:]
-		mailCC = strings.Join(mailAddresses, ",")
+		mailCC = (*user.Mail)[1:]
 	}
 
 	return userEmail, mailCC
 }
 
-func (h pwResetReqHandler) sendMail(to, cc, subject, msg string) error {
+func (h pwResetReqHandler) sendMail(to string, cc []string, subject, msg string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", h.config.EmailFrom)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", msg)
-	if cc != "" {
-		m.SetHeader("Cc", cc)
+	if len(cc) > 0 {
+		m.SetHeader("Cc", cc...)
 	}
 
 	if err := h.mailClient.DialAndSend(m); err != nil {

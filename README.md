@@ -6,6 +6,22 @@ This app will present a webform where a user can enter his/her username to reque
 The user will receive an e-mail on the address which is registered in IPA for this account. The e-mail will contain a link which the user has to open within the TokenValidity time (default: 5 minutes).
 When the user opens the link he'll get the opportunity to enter a new password.
 
+# Local development
+
+1. Configure the following required environment variables:
+
+- PWRESET_IPAHOST (an IPA server)
+- PWRESET_IPAUSER (IPA user with sufficient permissions to reset passwords)
+- PWRESET_IPAPASSWORD (Password for that user)
+- PWRESET_EMAILHOST (SMTP Host)
+- PWRESET_EMAILPORT (SMTP Port)
+- PWRESET_EMAILFROM (From Address)
+- PWRESET_REDISHOST
+
+2. Running the app
+
+    go run .
+
 #  How to deploy
 This app is developed to run on cloudfoundry but it should run anywhere. The following environment variables need to be set:
 - PWRESET_IPAHOST (an IPA server)

@@ -57,6 +57,7 @@ func (h pwResetReqHandler) HandleConfirmRequest(w http.ResponseWriter, r *http.R
 		tmpl.Execute(w, templData)
 	}()
 
+	addDefaultHeaders(&w)
 	ctx := context.Background()
 
 	//get token and Check token matches username

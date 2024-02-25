@@ -101,6 +101,7 @@ func (h pwResetReqHandler) HandleResetRequest(w http.ResponseWriter, r *http.Req
 		tmpl.Execute(w, templData)
 	}()
 
+	addDefaultHeaders(&w)
 	var ctx = context.Background()
 
 	ipaResult, err := h.ipaClient.UserShow(&freeipa.UserShowArgs{}, &freeipa.UserShowOptionalArgs{UID: &username})

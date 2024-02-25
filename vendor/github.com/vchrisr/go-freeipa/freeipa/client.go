@@ -34,6 +34,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strings"
 )
 
 // Client holds a connection to a FreeIPA server.
@@ -107,11 +108,18 @@ func (c *Client) login() error {
 		"user":     []string{c.user},
 		"password": []string{c.pw},
 	}
-	res, e := c.hc.PostForm(fmt.Sprintf("https://%v/ipa/session/login_password", c.host), data)
+	reqH, e := http.NewRequest("POST", fmt.Sprintf("https://%v/ipa/session/login_password", c.host), strings.NewReader(data.Encode()))
 	if e != nil {
 		return e
 	}
+	reqH.Header.Set("Referer", fmt.Sprintf("https://%v/ipa/ui", c.host))
+	reqH.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	res, e := c.hc.Do(reqH)
+
 	if res.StatusCode != http.StatusOK {
+		if res.StatusCode == http.StatusUnauthorized {
+			return unauthorizedHTTPResponseToFreeipaError(res)
+		}
 		return fmt.Errorf("unexpected http status code: %v", res.StatusCode)
 	}
 	return nil

@@ -1,7 +1,7 @@
 ---
 applications:
 - name: ((appname))   
-  stack: cflinuxfs3
+  stack: cflinuxfs4
   routes:
   - route: ((route))
   instances: ((instances))

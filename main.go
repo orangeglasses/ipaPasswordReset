@@ -29,6 +29,11 @@ type pwResetReqHandler struct {
 	BlockedGroups map[string]bool
 }
 
+func addDefaultHeaders(w *http.ResponseWriter) {
+	l := *w
+	l.Header().Set("X-Frame-Options", "SAMEORIGIN")
+}
+
 func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -49,7 +54,7 @@ func NewPwResetReqHandler(config appConfig) *pwResetReqHandler {
 			Password: config.RedisPassword,
 			DB:       config.RedisDB,
 		}),
-		mailClient: &gomail.Dialer{Host: config.EmailHost, Port: config.EmailPort, TLSConfig: mailTLSConfig},
+		mailClient: &gomail.Dialer{Host: config.EmailHost, Port: config.EmailPort, Username: config.EmailUser, Password: config.EmailPassword, TLSConfig: mailTLSConfig},
 		ipaClient:  ipaClient,
 		config:     config,
 	}

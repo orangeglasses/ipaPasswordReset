@@ -9,6 +9,7 @@ import (
 
 func (h pwResetReqHandler) PresentPwResetForm(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	addDefaultHeaders(&w)
 
 	data := struct {
 		Username    string
@@ -34,6 +35,7 @@ func (h pwResetReqHandler) PresentPwResetForm(w http.ResponseWriter, r *http.Req
 
 func (h pwResetReqHandler) PresentResetRequestForm(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	addDefaultHeaders(&w)
 
 	tmpl := template.Must(template.ParseFiles("enterRequest.tmpl"))
 
